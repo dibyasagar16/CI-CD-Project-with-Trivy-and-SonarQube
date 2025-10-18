@@ -68,7 +68,7 @@ pipeline {
         stage('Trivy Image Scan') {
             steps {
                 script {
-                    sh('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image dibyasagar06/reddit-clone-pipeline:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table > trivyimage.txt')
+                    sh('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image dibyasagar06/reddit-clone-app:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table > trivyimage.txt')
                 }
 
             }
@@ -86,7 +86,7 @@ pipeline {
     post{
         always {
             emailext attachLog: true,
-            subject: "'${currentbuild.result}'",
+            subject: "'${currentBuild.result}'",
             body: "Project: ${env.JOB_NAME}<br/>" +
                   "Build Number: ${env.BUILD_NUMBER}<br/>" +
                   "URL: ${env.BUILD_URL}<br/>",
