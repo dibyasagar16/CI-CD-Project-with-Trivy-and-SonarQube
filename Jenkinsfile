@@ -1,4 +1,4 @@
-bpipeline {
+pipeline {
     agent any
     tools{
         jdk 'jdk17'
