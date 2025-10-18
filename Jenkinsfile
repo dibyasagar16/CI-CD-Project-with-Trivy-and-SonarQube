@@ -1,4 +1,4 @@
-pipeline {
+bpipeline {
     agent any
     tools{
         jdk 'jdk17'
@@ -63,6 +63,30 @@ pipeline {
                         docker_image.push('latest')
                     }
                 }
+            }
+        }
+        stage('Trivy Image Scan') {
+            script {
+                sh('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image dibyasagar06/reddit-clone-pipeline:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table > trivyimage.txt')
+            }
+        }
+        stage('Clear Artifact') {
+            steps{
+                script {
+                    sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker rmi ${IMAGE_NAME}:latest"
+                }
+            }
+        }
+        post{
+            always {
+                emailext attachLog: true,
+                subject: "'${currentbuild.result}'",
+                body: "Project: ${env.JOB_NAME}<br/>" +
+                      "Build Number: ${env.BUILD_NUMBER}<br/>" +
+                      "URL: ${env.BUILD_URL}<br/>" +
+                to: 'samaldibyasagar@gmail.com'
+                attachmentsParttern: 'trivyfs.txt, truvyimage.txt'
             }
         }
     }
